@@ -8,7 +8,7 @@ from datetime import date
 BACKUP_FILE="backup_schedule.xlsx"
 
 st.set_page_config(page_title='Название',layout='wide')
-st.title('Рассписание дополнительных занятий')
+st.title('Расписание внеурочных занятий МАОУ СОШ № 211 им. Л. И. Сидоренко')
 
 @st.cache_data(ttl=1800)
 def load_data():
@@ -40,9 +40,9 @@ day_oge=(exam_oge-today).days
 day_ege=(exam_ege-today).days
 col_1,col_2=st.columns(2)
 with col_1:
-    st.metric(label='Дней до начала ОГЕ', value=f'{day_oge}')
+    st.metric(label='Дней до ОГЭ', value=f'{day_oge}')
 with col_2:
-    st.metric(label='Дней до начала ЕГЕ', value=f'{day_ege}')
+    st.metric(label='Дней до ЕГЭ', value=f'{day_ege}')
 st.markdown('---')
 
 #print(response.status_code)
@@ -75,9 +75,17 @@ if df is not None:
         if select_teach!="Все учителя":
             df_display=df_filter[df_filter["Учитель"]==select_teach]
         else:
-            df_display=df_filter
+            df_display=df_filter.copy()
     else:
-        df_display=df_filter
+        df_display=df_filter.copy()
+        
+    if "День недели" in df.columns:
+        days_order=['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье']
+        exist_days=[d for d in days_order if d in df['День недели'].dropna().unique()]
+        days=['Все дни'] + exist_days
+        select_day=st.sidebar.selectbox('Выберите день недели:', days)
+        if select_day!='Все дни':
+            df_display=df_display[df_display['День недели']==select_day]
 
     tab1,tab2,tab3=st.tabs(['Рассписание','Важная информация','Обратная связь'])
 
@@ -88,12 +96,12 @@ if df is not None:
         st.subheader('Официальные банки заданий и ресурсы')
         col1,col2=st.columns(2)
         with col1:
-            st.link_button('Банк ОГЕ (ФИПИ)','https://fipi.ru')
+            st.link_button('Банк ОГЭ (ФИПИ)','https://fipi.ru')
         with col2:
-            st.link_button('Банк ЕГЕ ( ФИПИ)','https://fipi.ru')
+            st.link_button('Банк ЕГЭ ( ФИПИ)','https://fipi.ru')
         st.markdown('---')
 
-        with st.expander('Важные даты и итоговые работы'):
+        with st.expander('Важные даты для 9 и 11 классов: контрольные, собеседования, сочинения'):
             st.write('Итоговое собеседование (9 класс): Февраль 2027 г.')
             st.write('Итоговое сочинение (11 класс): Декабрь 2026 г.')
         with st.expander('что делать если возниклт вопросы или ошибки?'):
