@@ -12,26 +12,28 @@ st.title('Расписание внеурочных занятий МАОУ СО
 
 @st.cache_data(ttl=1800)
 def load_data():
-    UrL=st.secrets['YANDEX_URL']
-    api=('https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key='+ quote(UrL))
-
+    Url='https://disk.yandex.ru/i/6ffS5eKjTMNNag'
+    api=('https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key='+ quote(Url))
     try:
-        response=requests.get(api,timeout=5)
+        response=requests.get(api, timeout=15)
         if response.status_code==200:
             data=response.json()
             down_url=data["href"]
-            df=pd.read_excel(down_url)
-            df.to_excel(BACKUP_FILE, index=False)
+            file_resp=requests.get(down_url, timeout=30)
+            with open(BACKUP_FILE, 'wb') as f:
+                f.write(file_resp.content)
+            import io
+            df=pd.read_excel(io.BytesIO(file_resp.content), engine='calamine')
             return df
     except Exception as e:
-        pass
-
+        st.sidebar.error(f"Ошибка: {e}")
+    
     if os.path.exists(BACKUP_FILE):
         st.sidebar.warning("Нет связи с облаком. Загружена автономная копия расписания.")
-        df=pd.read_excel(BACKUP_FILE)
+        df=pd.read_excel(BACKUP_FILE, engine='calamine')
         return df
     return None
-
+    
 today=date.today()
 exam_oge=date(2027,6,2)
 exam_ege=date(2027,6,1)
