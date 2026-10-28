@@ -59,23 +59,24 @@ if df is not None:
                  f"колонки {missing_cols}. Проверьте заголовки в таблице!")
         st.stop()
         
-    st.sidebar.header('Панель управления')
-    if "Класс" in df.columns:
-        classes=['Все классы']+list(df["Класс"].dropna().unique())
-        select_cl=st.sidebar.selectbox("Выберите класс:", classes)
-
-        if select_cl!="Все классы":
-            df_filter=df[df["Класс"]==select_cl]
+        st.sidebar.header('Панель управления')
+    if "Учитель" in df.columns:
+        teachers=['Все учителя']+list(df["Учитель"].dropna().unique())
+        select_teach=st.sidebar.selectbox("Выберите учителя:", teachers)
+    
+        if select_teach!="Все учителя":
+            df_filter=df[df["Учитель"]==select_teach]
         else:
             df_filter=df.copy()
     else:
-        df_display=df.copy()
-    if "Учитель" in df.columns:
-        teachers=['Все учителя']+list(df_filter["Учитель"].dropna().unique())
-        select_teach=st.sidebar.selectbox("Выберите учителя:", teachers)
+        df_filter=df.copy()
 
-        if select_teach!="Все учителя":
-            df_display=df_filter[df_filter["Учитель"]==select_teach]
+    if "Класс" in df.columns:
+        classes=['Все классы']+list(df_filter["Класс"].dropna().unique())
+        select_cl=st.sidebar.selectbox("Выберите класс:", classes)
+    
+        if select_cl!="Все классы":
+            df_display=df_filter[df_filter["Класс"]==select_cl]
         else:
             df_display=df_filter.copy()
     else:
