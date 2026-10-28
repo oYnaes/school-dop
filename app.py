@@ -12,7 +12,7 @@ st.title('Расписание внеурочных занятий МАОУ СО
 
 @st.cache_data(ttl=1800)
 def load_data():
-    Url='https://disk.yandex.ru/i/6ffS5eKjTMNNag'
+    Url=st.secrets["YANDEX_URL"]
     api=('https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key='+ quote(Url))
     try:
         response=requests.get(api, timeout=15)
